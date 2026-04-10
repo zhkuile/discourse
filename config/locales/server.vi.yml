@@ -249,7 +249,11 @@ vi:
   deleted_topic: "Ôi! Chủ đề này đã bị xóa và không còn khả dụng nữa."
   delete_topic_failed: "Đã xảy ra lỗi khi xóa chủ đề đó. Vui lòng liên hệ với quản trị viên của trang web."
   reading_time: "Thời gian đọc"
+  reading_time_minutes:
+    other: "%{count} phút 🕑"
   likes: "Lượt Thích"
+  likes_count:
+    other: "%{count} ❤"
   too_many_replies:
     other: "Xin lỗi bạn, người dùng mới tạm thời bị giới hạn với %{count} câu trả lời trong một chủ đề."
   max_consecutive_replies:

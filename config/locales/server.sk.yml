@@ -491,7 +491,17 @@ sk:
   deleted_topic: "Ups! Táto téma bola vymazaná a už nie je k dispozícii."
   delete_topic_failed: "Pri odstraňovaní tejto témy došlo k chybe. Obráťte sa, prosím, na správcu stránky."
   reading_time: "Doba čítania"
+  reading_time_minutes:
+    one: "%{count} minúta 🕑"
+    few: "%{count} minúty 🕑"
+    many: "%{count} minút 🕑"
+    other: "%{count} minút 🕑"
   likes: "Páči sa mi"
+  likes_count:
+    one: "%{count} ❤"
+    few: "%{count} ❤"
+    many: "%{count} ❤"
+    other: "%{count} ❤"
   action_already_performed: "Ups! Túto akciu ste už vykonali. Môžete skúsiť obnoviť stránku?"
   too_many_replies:
     one: "Ľutujeme, noví používatelia majú dočasne obmedzený počet príspevkov na jeden v rámci jednej témy."
@@ -2515,7 +2525,6 @@ sk:
     create_revision_on_bulk_topic_moves: "Vytvorte revíziu pre prvé príspevky, keď sa témy hromadne presunú do novej kategórie."
     allow_changing_staged_user_tracking: "Umožniť nezaktívnenému používateľovi s právami administrátora meniť preferencie kategórií a upozornení na značky."
     use_email_for_username_and_name_suggestions: "Na návrhy používateľského mena a mena použite prvú časť e-mailových adries. Upozornenie: To môže zlým aktérom uľahčiť zistenie e-mailovej adresy vašich členov (pretože mnohí ľudia používajú bežných poskytovateľov e-mailu, ako je `gmail.com`)."
-    use_name_for_username_suggestions: "Pri navrhovaní používateľských mien používajte celé meno používateľa."
     suggest_weekends_in_date_pickers: "Zahrnúť víkendy (sobotu a nedeľu) do návrhov na výber dátumu (ak Discourse používate len počas pracovných dní, od pondelka do piatku, vypnite túto funkciu)."
     show_bottom_topic_map: "Zobrazí mapu témy v spodnej časti témy, ak má 10 alebo viac odpovedí."
     show_topic_map_in_topics_without_replies: "Zobrazí mapu témy, aj keď téma nemá žiadne odpovede."

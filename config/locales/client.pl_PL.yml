@@ -3803,6 +3803,8 @@ pl_PL:
         clear_all: "Wyczyść wszystko"
         unlist_topics: "Usuń tematy z listy"
         relist_topics: "Zamieść ponownie tematy"
+        pin_topics: "Wyróżnij te tematy"
+        unpin_topics: "Odepnij tematy"
         reset_bump_dates: "Zresetuj datę podbicia"
         defer: "Oznacz jako nieprzeczytany"
         delete: "Usuń tematy"
@@ -3889,6 +3891,11 @@ pl_PL:
           few: "Wszystkie tagi zostaną usunięte z <b>%{count}</b> tematów. Jesteś pewny?"
           many: "Wszystkie tagi zostaną usunięte z <b>%{count}</b> tematów. Jesteś pewny?"
           other: "Wszystkie tagi zostaną usunięte z <b>%{count}</b> tematów. Jesteś pewny?"
+        confirm_unpin_topics:
+          one: "Odepnij %{count} temat"
+          few: "Odepnij %{count} tematy"
+          many: "Odepnij %{count} tematów"
+          other: "Odepnij %{count} tematów"
         confirm_update_topics:
           one: "Zaktualizuj %{count} temat"
           few: "Zaktualizuj %{count} tematy"
@@ -4018,6 +4025,11 @@ pl_PL:
       update_notifications:
         name: "Aktualizuj powiadomienia"
         description: "Zaktualizuj swój osobisty poziom powiadomień dla wybranych tematów, aby:"
+      pin_topics:
+        name: "Przypnij"
+      unpin_topics:
+        name: "Odepnij"
+        description: "Odepnij wszystkie wybrane tematy, które są przypięte do kategorii lub przypięte globalnie"
     topic:
       filter_to:
         one: "%{count} post w temacie"
@@ -4171,6 +4183,7 @@ pl_PL:
         publish_to: "Opublikuj do:"
         when: "Kiedy:"
         time_frame_required: "Wybierz przedział czasowy"
+        category_required: "Wybierz kategorię"
         min_duration: "Czas trwania musi być większy niż 0"
         max_duration: "Czas trwania musi być krótszy niż 20 lat"
         duration: "Czas trwania"
@@ -4366,6 +4379,12 @@ pl_PL:
         banner_note: "Użytkownicy mogą usunąć baner zamykając go przyciskiem. Tylko jeden temat może być banerem w danej chwili."
         no_banner_exists: "Baner nie jest obecnie ustawiony."
         banner_exists: "Baner <strong class='badge badge-notification unread'>jest</strong> obecnie ustawiony."
+      bulk_feature_topic:
+        pin: "Spraw, aby te tematy wyświetlały się na górze kategorii tematów, aż do"
+        pin_note: "Użytkownicy mogą odpinać tematy indywidualnie dla siebie."
+        pin_globally: "Spraw, aby te tematy wyświetlały się na górze wszystkich list tematów, aż do"
+        pin_button: "Przypnij tematy"
+        pin_globally_button: "Przypnij tematy globalnie"
       inviting: "Zapraszam…"
       automatically_add_to_groups: "To zaproszenie obejmuje również dostęp do tych grup:"
       invite_private:

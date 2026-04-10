@@ -3460,6 +3460,8 @@ tr_TR:
         clear_all: "Tümünü Temizle"
         unlist_topics: "Konuları gizle"
         relist_topics: "Konuları yeniden listele"
+        pin_topics: "Bu konuları öne çıkarın"
+        unpin_topics: "Konuların Sabitlemesini Kaldır"
         reset_bump_dates: "Üste sıçratma tarihlerini sıfırla"
         defer: "Okunmamış olarak işaretle"
         delete: "Konuları sil"
@@ -3524,6 +3526,9 @@ tr_TR:
         confirm_remove_tags:
           one: "Bu konudan tüm etiketler kaldırılacak. Emin misiniz?"
           other: "%{count} konudan tüm etiketler kaldırılacak. Emin misiniz?"
+        confirm_unpin_topics:
+          one: "%{count} konuyu sabitlemekten vazgeç"
+          other: "%{count} konuyu sabitlemekten vazgeç"
         confirm_update_topics:
           one: "%{count} konuyu güncelle"
           other: "%{count} konuyu güncelle"
@@ -3627,6 +3632,11 @@ tr_TR:
       update_notifications:
         name: "Bildirimleri güncelle"
         description: "Seçilen konular için kişisel bildirim düzeyinizi şu şekilde güncelleyin:"
+      pin_topics:
+        name: "Sabitle"
+      unpin_topics:
+        name: "Sabitlemeyi kaldır"
+        description: "Bir kategoriye veya genel olarak sabitlenmiş olan tüm seçili konuların sabitlemesini kaldır"
     topic:
       filter_to:
         one: "Konuda %{count} gönderi"
@@ -3760,6 +3770,7 @@ tr_TR:
         publish_to: "Şuraya Yayınla:"
         when: "Ne zaman:"
         time_frame_required: "Lütfen bir zaman aralığı seçin"
+        category_required: "Lütfen bir kategori seçin"
         min_duration: "Süre 0'dan büyük olmalıdır"
         max_duration: "Süre 20 yıldan az olmalıdır"
         duration: "Süre"
@@ -3941,6 +3952,12 @@ tr_TR:
         banner_note: "Kullanıcılar bu banner'ı kapatarak yok sayabilirler. Herhangi bir zamanda yalnızca bir konu banner yapılabilir."
         no_banner_exists: "Banner konusu yok."
         banner_exists: "Şu anda bir banner konusu <strong class='badge badge-notification unread'>var</strong>."
+      bulk_feature_topic:
+        pin: "Bu konuların, şu tarihe kadar ilgili kategorinin en üstünde görünmesini sağlayın"
+        pin_note: "Kullanıcılar, konuları kendileri için tek tek sabitlemekten vazgeçebilirler."
+        pin_globally: "Bu konular, şu tarihe kadar tüm konu listelerinin en üstünde görünsün"
+        pin_button: "Konuları sabitle"
+        pin_globally_button: "Konuları global olarak sabitle"
       inviting: "Davet Ediliyor…"
       automatically_add_to_groups: "Bu davet aynı zamanda şu gruplara erişim sağlar:"
       invite_private:
@@ -5728,6 +5745,8 @@ tr_TR:
         permanent_no_group_selection: "Yok, kalıcı değişiklikler tüm gruplar için geçerlidir."
         no_changes: "Şu anda yaklaşan bir değişiklik yoktur."
         preview: "Ön izle"
+        default_warning: "Bu ayarın varsayılan değeri, <a href='%{basePath}/admin/config/upcoming-changes?changeNamesFilter=%{changeNamesFilter}'>yakında yapılacak bir değişiklik</a> nedeniyle %{oldDefaultValue}'den %{newDefaultValue}'ye değiştirilmiştir."
+        default_warning_short: "Bu ayarın varsayılan değeri değiştirildi; bu konuyla ilgili daha fazla bilgiyi <a href='%{basePath}/admin/config/upcoming-changes?changeNamesFilter=%{changeNamesFilter}'>yakında gelecek değişiklikler</a> sayfasında bulabilirsiniz."
         enabled_for_options:
           no_one: "Hiç kimse"
           everyone: "Herkes"
@@ -5765,6 +5784,7 @@ tr_TR:
           impact_type_all: "Tüm darbe türleri"
           impact_type_feature: "Özellik"
           impact_type_other: "Diğer"
+          impact_type_site_setting_default: "Varsayılan ayar"
           status_all: "Tüm durumlar"
           status_conceptual: "Kavramsal"
           status_experimental: "Deneysel"

@@ -433,7 +433,13 @@ nl:
   deleted_topic: "Oeps! Dit topic is verwijderd en is niet meer beschikbaar."
   delete_topic_failed: "Er is een fout opgetreden bij het verwijderen van dat topic. Neem contact op met de beheerder van de website."
   reading_time: "Leestijd"
+  reading_time_minutes:
+    one: "%{count} min 🕑"
+    other: "%{count} min 🕑"
   likes: "Likes"
+  likes_count:
+    one: "%{count} ❤"
+    other: "%{count} ❤"
   action_already_performed: "Oeps! Je hebt deze actie al uitgevoerd. Kun je proberen de pagina te vernieuwen?"
   too_many_replies:
     one: "Sorry, nieuwe gebruikers mogen tijdelijk slechts %{count} antwoord in hetzelfde topic plaatsen."
@@ -2368,7 +2374,6 @@ nl:
     create_revision_on_bulk_topic_moves: "Maak een revisie voor eerste berichten wanneer topics in bulk naar een nieuwe categorie worden verplaatst."
     allow_changing_staged_user_tracking: "Sta toe dat de meldingsvoorkeuren voor categorieën en tags van een gefaseerde gebruiker worden gewijzigd door een beheerder."
     use_email_for_username_and_name_suggestions: "Gebruik het eerste deel van e-mailadressen als suggestie voor namen en gebruikersnamen. Waarschuwing: dit kan het makkelijker maken voor kwaadwillenden om het e-mailadres van je leden te achterhalen (omdat veel mensen gebruik maken van veelgebruikte aanbieders als 'gmail.com')."
-    use_name_for_username_suggestions: "Gebruik de volledige naam van een gebruiker bij het voorstellen van gebruikersnamen."
     suggest_weekends_in_date_pickers: "Neem weekenden (zaterdag en zondag) op in suggesties voor datumkiezers (schakel dit uit als je Discourse alleen op weekdagen gebruikt, maandag t/m vrijdag)."
     show_bottom_topic_map: "Geeft de topickaart onderaan het topic weer wanneer er 10 of meer antwoorden zijn."
     show_topic_map_in_topics_without_replies: "Geeft de onderwerpkaart weer, ook als er geen antwoorden op het topic zijn."

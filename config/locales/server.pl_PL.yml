@@ -499,7 +499,17 @@ pl_PL:
   deleted_topic: "Ups! Ten temat został usunięty i nie jest już dostępny."
   delete_topic_failed: "Podczas usuwania tego tematu wystąpił błąd. Skontaktuj się z administratorem strony."
   reading_time: "Czas odczytu"
+  reading_time_minutes:
+    one: "%{count} minuta 🕑"
+    few: "%{count} minuty 🕑"
+    many: "%{count} minut 🕑"
+    other: "%{count} minut 🕑"
   likes: "Polubienia"
+  likes_count:
+    one: "%{count} ❤"
+    few: "%{count} ❤"
+    many: "%{count} ❤"
+    other: "%{count} ❤"
   action_already_performed: "Ups! Wykonałeś już tę czynność. Czy możesz spróbować odświeżyć stronę?"
   too_many_replies:
     one: "Przepraszamy, ale nowi użytkownicy są tymczasowo ograniczeni do %{count} odpowiedzi w ramach jednego tematu."
@@ -1304,6 +1314,7 @@ pl_PL:
       every_six_months: "co 6 miesięcy"
   calendar_subscriptions:
     application_name: "Subskrypcje kalendarza"
+    bookmarks_feed_name: "%{site_title} - Przypomnienia w zakładkach"
   user_api_key:
     title: 'Autoryzuj "%{application_name}"'
     authorize: "Autoryzuj"
@@ -1882,8 +1893,6 @@ pl_PL:
     max_oneboxes_per_post: "Ustaw maksymalną liczbę oneboxów, które można umieścić w jednym poście. Oneboxy zapewniają podgląd powiązanej treści bezpośrednio w poście."
     facebook_app_access_token: "Token wygenerowany z Twojego identyfikatora aplikacji Facebook i sekret. Używany do generowania osadzonych oneboxów z serwisu Instagram."
     github_onebox_access_tokens: "Mapowanie organizacji lub użytkownika GitHub na token dostępu GitHub, który jest używany do generowania oneboxów GitHub dla prywatnych repozytoriów, commitów, pull requestów, zgłoszeń i zawartości plików. Bez tego tylko publiczne adresy URL GitHub będą miały onebox."
-    reddit_onebox_client_id: "Identyfikator klienta OAuth API Reddit używany do uwierzytelniania skrzynek Reddit. Utwórz aplikację typu „skrypt” na stronie reddit.com/prefs/apps, aby uzyskać dane uwierzytelniające."
-    reddit_onebox_client_secret: "Klucz klienta OAuth API Reddit używany do uwierzytelniania skrzynek OneBox w Reddit. Znajduje się w aplikacji typu „skrypt” utworzonej na stronie reddit.com/prefs/apps."
     logo: "Obraz logo w lewym górnym rogu witryny. Użyj szerokiego prostokątnego obrazu o wysokości 120 i współczynniku kształtu większym niż 3: 1. Jeśli pole pozostanie puste, wyświetlony zostanie tekst tytułu witryny."
     logo_small: "Mały obraz logo w lewym górnym rogu witryny, widoczny podczas przewijania w dół. Użyj kwadratowego obrazu 120 × 120. Jeśli pole pozostanie puste, wyświetlony zostanie glif domowy."
     digest_logo: "Alternatywne logo użyte w górnej części podsumowania e-mail witryny. Użyj szerokiego obrazu prostokąta. Nie używaj obrazu SVG. Jeśli pole pozostanie puste, zostanie użyty obraz z ustawienia „logo”."
@@ -2234,6 +2243,7 @@ pl_PL:
     max_here_mentioned: "Maksymalna liczba osób oznaczonych przez @here."
     here_mention_allowed_groups: "Grupy, które mogą wspominać @here. Administratorzy i moderatorzy zawsze mogą wspomnieć @here."
     create_thumbnails: "Stwórz miniatury i obrazy lightbox, które są za duże, aby pasować do wpisu."
+    animated_topic_thumbnails: "Zamiast generować statyczną miniaturę, użyj oryginalnego obrazu animowanego jako miniatury tematycznej."
     email_time_window_mins: "Odczekaj (n) minut przed wysłaniem e-maila z powiadomieniem, aby dać użytkownikom szansę na edytowanie i ukończenie wpisów."
     personal_email_time_window_seconds: "Poczekaj (n) sekund przed wysłaniem powiadomienia na e-mail o prywatnej wiadomości, by użytkownicy mogli edytować i dokończyć swoje wiadomości."
     email_posts_context: "Jak wiele poprzednich wiadomości zawrzeć jako kontekst i emailu powiadamiającym."
@@ -2610,7 +2620,7 @@ pl_PL:
     create_revision_on_bulk_topic_moves: "Utwórz rewizję dla pierwszych postów, gdy tematy zostaną przeniesione do nowej kategorii zbiorczo."
     allow_changing_staged_user_tracking: "Zezwalaj na zmianę preferencji powiadomień o kategoriach i tagach użytkownika etapowego przez administratora."
     use_email_for_username_and_name_suggestions: "Użyj pierwszej części adresów e-mail do sugestii nazw użytkowników i nazw. Ostrzeżenie: Może to ułatwić złośliwym użytkownikom odkrycie adresów e-mail twoich członków (ponieważ wiele osób korzysta z popularnych dostawców poczty, takich jak `gmail.com`)."
-    use_name_for_username_suggestions: "Proponując nazwy użytkownika, używaj imienia i nazwiska użytkownika."
+    use_name_for_username_suggestions: "Podczas sugerowania nazw użytkowników podczas rejestracji SSO i OAuth należy używać imienia i nazwiska użytkownika."
     suggest_weekends_in_date_pickers: "Uwzględnij weekendy (sobota i niedziela) w sugestiach selektora dat (wyłącz tę opcję, jeśli używasz Discourse tylko w dni powszednie, od poniedziałku do piątku)."
     show_bottom_topic_map: "Wyświetla mapę tematu u dołu tematu, gdy ma on 10 lub więcej odpowiedzi."
     show_topic_map_in_topics_without_replies: "Wyświetla mapę tematu, nawet jeśli temat nie ma odpowiedzi."

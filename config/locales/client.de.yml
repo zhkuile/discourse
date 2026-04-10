@@ -2858,6 +2858,11 @@ de:
       clear: "Filter löschen"
     d_icon_grid_picker:
       select_icon: "Symbol auswählen"
+      no_results: "Keine Symbole gefunden"
+      results_count:
+        one: "%{count} Symbol gefunden"
+        other: "%{count} Symbole gefunden"
+      favorites: "Favoriten"
     shared_drafts:
       title: "Gemeinsame Entwürfe"
       notice: "Dieses Thema ist nur für diejenigen sichtbar, die gemeinsame Entwürfe veröffentlichen können."
@@ -3746,6 +3751,7 @@ de:
         publish_to: "Veröffentlichen in:"
         when: "Wann:"
         time_frame_required: "Bitte wähle einen Zeitrahmen aus"
+        category_required: "Bitte wähle eine Kategorie"
         min_duration: "Dauer muss mehr als 0 betragen"
         max_duration: "Dauer muss weniger als 20 Jahre betragen"
         duration: "Dauer"

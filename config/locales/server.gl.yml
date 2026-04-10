@@ -248,6 +248,9 @@ gl:
   delete_topic_failed: "Houbo un erro ao eliminar este tema. Contacte co administrador do sitio."
   reading_time: "Tempo de lectura"
   likes: "Gústame"
+  likes_count:
+    one: "%{count} ❤"
+    other: "%{count} ❤"
   too_many_replies:
     one: "Sentímolo, mais os novos usuarios teñen temporalmente un límite de %{count} resposta no mesmo tema."
     other: "Sentímolo, mais os novos usuarios teñen temporalmente un límite de %{count} resposta no mesmo tema."

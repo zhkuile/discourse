@@ -441,7 +441,13 @@ tr_TR:
   deleted_topic: "Hay aksi! Bu konu silinmiş ve artık mevcut değil."
   delete_topic_failed: "Bu konuyu silerken bir hata oluştu. Lütfen site yöneticisiyle iletişime geçin."
   reading_time: "Okuma süresi"
+  reading_time_minutes:
+    one: "%{count} dk 🕑"
+    other: "%{count} dk 🕑"
   likes: "Beğeniler"
+  likes_count:
+    one: "%{count} ❤"
+    other: "%{count} ❤"
   action_already_performed: "Hay aksi! Bu eylemi zaten gerçekleştirdiniz. Sayfayı yenilemeyi deneyebilir misiniz?"
   too_many_replies:
     one: "Üzgünüz, ancak yeni kullanıcılar geçici olarak aynı konuya %{count} yanıt verebilir."
@@ -1152,6 +1158,7 @@ tr_TR:
       every_six_months: "altı ayda bir"
   calendar_subscriptions:
     application_name: "Takvim Abonelikleri"
+    bookmarks_feed_name: "%{site_title} - Yer imi hatırlatıcıları"
   user_api_key:
     title: '"%{application_name}" için yetkilendirme'
     authorize: "Yetkilendir"
@@ -1728,8 +1735,6 @@ tr_TR:
     max_oneboxes_per_post: "Tek bir gönderiye dâhil edilebilecek maksimum onebox sayısını ayarlayın. Onebox'lar gönderi içindeki bağlantılı içeriğin ön izlemesini sağlar."
     facebook_app_access_token: "Facebook uygulama kimliğinizden ve gizli dizinizden oluşturulan bir belirteç. Instagram onebox'ları oluşturmak için kullanılır."
     github_onebox_access_tokens: "Bir GitHub kuruluşunun veya kullanıcısının, özel depolar, taahhütler, çekme istekleri, sorunlar ve dosya içerikleri için GitHub onebox'ları oluşturma amacıyla kullanılan bir GitHub erişim belirteciyle eşleştirilmesi. Bu olmadan, yalnızca genel GitHub URL'leri onebox'lanır."
-    reddit_onebox_client_id: "Kimlik doğrulaması yapılmış Reddit onebox'lar için kullanılan Reddit API OAuth istemci kimliği. Kimlik bilgilerini almak için reddit.com/prefs/apps adresinde 'script' türünde bir uygulama oluşturun."
-    reddit_onebox_client_secret: "Reddit API OAuth istemci gizli anahtarı, kimliği doğrulanmış Reddit onebox'lar için kullanılır. reddit.com/prefs/apps adresinde oluşturulan 'script' türü uygulama altında bulunur."
     logo: "Sitenizin sol üst köşesindeki logo görüntüsü. Yüksekliği 120 ve en boy oranı 3:1'den büyük olan geniş dikdörtgen bir görüntü kullanın. Boş bırakılırsa site başlığı metni gösterilecektir."
     logo_small: "Sitenizin sol üst köşesinde, aşağı kaydırırken görülen küçük logo görüntüsü. 120 × 120 boyutlarında kare bir görüntü kullanın. Boş bırakılırsa bir ana sayfa glifi gösterilecektir."
     digest_logo: "Sitenizin e-posta özetinin üst kısmında kullanılan alternatif logo görüntüsü. Geniş bir dikdörtgen görüntü kullanın. SVG görüntüsü kullanmayın. Boş bırakılırsa \"logo\" ayarındaki görüntü kullanılır."
@@ -2080,6 +2085,7 @@ tr_TR:
     max_here_mentioned: "@Burada bahsedilen maksimum kişi sayısı."
     here_mention_allowed_groups: "@Buradan bahsetmesine izin verilen gruplar. Yöneticiler ve moderatörler her zaman @buradan bahsedebilir."
     create_thumbnails: "Bir gönderiye sığmayacak kadar büyük küçük resimler ve ışık kutusu görüntüleri oluşturun."
+    animated_topic_thumbnails: "Statik bir küçük resim oluşturmak yerine, orijinal animasyonlu görüntüyü konu küçük resmi olarak kullanın."
     email_time_window_mins: "Kullanıcılara gönderilerini düzenleme ve son haline getirme şansı tanımak için herhangi bir bildirim e-postası göndermeden önce (n) dakika bekleyin."
     personal_email_time_window_seconds: "Kullanıcılara mesajlarını düzenleme ve son haline getirme şansı tanımak için herhangi bir kişisel mesaj bildirim e-postası göndermeden önce (n) saniye bekleyin."
     email_posts_context: "Bildirim e-postalarına bağlam olarak kaç tane önceki yanıtın dâhil edileceği."
@@ -2456,7 +2462,7 @@ tr_TR:
     create_revision_on_bulk_topic_moves: "Konular toplu olarak yeni bir kategoriye taşındığında ilk gönderiler için revizyon oluşturun."
     allow_changing_staged_user_tracking: "Aşamalı bir kullanıcının kategori ve etiket bildirim tercihlerinin bir yönetici kullanıcı tarafından değiştirilmesine izin verin."
     use_email_for_username_and_name_suggestions: "Kullanıcı ismi ve isim önerileri için e-posta adreslerinin ilk kısmını kullanın. Uyarı: Bu ayar, kötü niyetli kişilerin üyelerinizin e-posta adresini keşfetmesini kolaylaştırabilir (çünkü birçok kişi `gmail.com` gibi yaygın e-posta sağlayıcılarını kullanır)."
-    use_name_for_username_suggestions: "Kullanıcı adı önerirken kullanıcının tam adını kullanın."
+    use_name_for_username_suggestions: "SSO ve OAuth kayıt süreçleri sırasında kullanıcı adı önerirken kullanıcının tam adını kullanın."
     suggest_weekends_in_date_pickers: "Tarih seçici önerilerine hafta sonlarını (cumartesi ve pazar) dahil edin (Discourse'u yalnızca hafta içi, pazartesiden cumaya kadar kullanıyorsanız bunu devre dışı bırakın)."
     show_bottom_topic_map: "Konuya 10 veya daha fazla yanıt geldiğinde konu haritasını konunun altında gösterir."
     show_topic_map_in_topics_without_replies: "Konuya yanıt gelmese bile konu haritasını gösterir."

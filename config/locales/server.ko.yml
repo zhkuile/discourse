@@ -265,7 +265,11 @@ ko:
   deleted_topic: "이 주제는 삭제되었으며 더는 사용할 수 없습니다."
   delete_topic_failed: "이 주제를 삭제하는 중에 오류가 발생했습니다. 사이트 관리자에게 문의하세요."
   reading_time: "읽은 시간"
+  reading_time_minutes:
+    other: "%{count}분 🕑"
   likes: "좋아요"
+  likes_count:
+    other: "%{count} ❤"
   too_many_replies:
     other: "신규 사용자는 일시적으로 동일 주제에 %{count}개까지만 댓글을 달 수 있습니다."
   max_consecutive_replies:

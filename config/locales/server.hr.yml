@@ -264,7 +264,15 @@ hr:
   deleted_topic: "Ups! Ova je tema izbrisana i više nije dostupna."
   delete_topic_failed: "Došlo je do pogreške prilikom brisanja te teme. Molimo kontaktirajte administratora stranice."
   reading_time: "Vrijeme čitanja"
+  reading_time_minutes:
+    one: "%{count} min 🕑"
+    few: "%{count} mins 🕑"
+    other: "%{count} minuta 🕑"
   likes: "Like-ova"
+  likes_count:
+    one: "%{count} ❤"
+    few: "%{count} ❤"
+    other: "%{count} ❤"
   too_many_replies:
     one: "Žao nam je, ali novi korisnici su privremeno ograničeni na %{count} odgovora u istoj temi."
     few: "Žao nam je, ali novi korisnici su privremeno ograničeni na %{count} odgovora u istoj temi."
@@ -1473,7 +1481,6 @@ hr:
     share_quote_visibility: "Odredite kada prikazati gumbe za dijeljenje ponuda: nikada, samo anonimnim korisnicima ili svim korisnicima. "
     create_revision_on_bulk_topic_moves: "Napravite reviziju za prve postove kada se teme skupno premještaju u novu kategoriju."
     allow_changing_staged_user_tracking: "Dopustite korisniku administratoru da promijeni postavke obavijesti o kategorijama i oznakama postupnog korisnika."
-    use_name_for_username_suggestions: "Koristite puno ime korisnika kada predlažete korisnička imena."
     suggest_weekends_in_date_pickers: "Uključite vikende (subota i nedjelja) u prijedloge za odabir datuma (onemogućite ovo ako Discourse koristite samo radnim danima, od ponedjeljka do petka)."
     splash_screen: "Prikazuje privremeni zaslon za učitavanje dok se sredstva web-mjesta učitavaju"
     errors:

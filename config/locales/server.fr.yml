@@ -433,7 +433,13 @@ fr:
   deleted_topic: "Ce sujet a été supprimé et n'est plus disponible."
   delete_topic_failed: "Une erreur est survenue pendant la suppression de ce sujet. Veuillez contacter l'administrateur du site."
   reading_time: "Temps de lecture"
+  reading_time_minutes:
+    one: "%{count} minute 🕑"
+    other: "%{count} minutes 🕑"
   likes: "J'aime"
+  likes_count:
+    one: "%{count}  ❤"
+    other: "%{count}  ❤"
   action_already_performed: "Oups ! Vous avez déjà effectué cette action. Pouvez-vous essayer d'actualiser la page ?"
   too_many_replies:
     one: "Nous sommes désolés, mais les nouveaux utilisateurs sont temporairement limités à %{count} réponse par sujet."
@@ -2374,7 +2380,6 @@ fr:
     create_revision_on_bulk_topic_moves: "Créer une révision des premières publications lorsque des sujets sont déplacés en bloc vers une nouvelle catégorie."
     allow_changing_staged_user_tracking: "Permettre aux administrateurs de modifier les préférences de notification relatives aux catégories et aux étiquettes, pour les comptes d'utilisateurs distants."
     use_email_for_username_and_name_suggestions: "Utilisez la première partie des adresses e-mail pour suggérer des noms d'utilisateur et des noms de famille. Attention : cela peut faciliter la découverte de l'adresse e-mail de vos membres par des personnes malintentionnées (car de nombreuses personnes utilisent des fournisseurs de messagerie courants comme « gmail.com »)."
-    use_name_for_username_suggestions: "Utiliser le nom complet d'un utilisateur lorsque vous suggérez des noms d'utilisateur."
     suggest_weekends_in_date_pickers: "Inclure les week-ends dans les suggestions du sélectionneur de date (désactivez ce paramètre si vous n'utilisez Discourse que les jours de semaine)."
     show_bottom_topic_map: "Affiche la carte du sujet en bas du sujet lorsqu'il contient 10 réponses ou plus."
     show_topic_map_in_topics_without_replies: "Affiche la carte du sujet même si le sujet ne comprend aucune réponse."

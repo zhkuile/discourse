@@ -203,7 +203,13 @@ ca:
     join_group: "Uneix-me al grup"
   deleted_topic: "Oh! Aquest tema s'ha suprimit i ja no està disponible."
   reading_time: "Temps de lectura."
+  reading_time_minutes:
+    one: "%{count} min 🕑"
+    other: "%{count} min 🕑"
   likes: "'M'agrada'"
+  likes_count:
+    one: "%{count} ❤"
+    other: "%{count} ❤"
   too_many_replies:
     one: "Ho sentim, però els usuaris nous estan de moment limitats a %{count} resposta en el mateix tema."
     other: "Ho sentim, però els usuaris nous estan de moment limitats a %{count} respostes en el mateix tema."

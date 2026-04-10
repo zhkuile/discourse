@@ -326,7 +326,13 @@ sv:
   deleted_topic: "Hoppsan! Detta ämne har tagits bort och är inte längre tillgängligt."
   delete_topic_failed: "Det uppstod ett fel när det ämnet skulle tas bort. Kontakta webbplatsens administratör."
   reading_time: "Lästid"
+  reading_time_minutes:
+    one: "%{count} min 🕑"
+    other: "%{count} min 🕑"
   likes: "Gillningar"
+  likes_count:
+    one: "%{count} ❤"
+    other: "%{count} ❤"
   action_already_performed: "Hoppsan! Du har redan utfört den här åtgärden. Kan du försöka uppdatera sidan?"
   too_many_replies:
     one: "Tyvärr är nya användare tillfälligt begränsade till %{count} svar i samma ämne."
@@ -2020,7 +2026,6 @@ sv:
     share_quote_visibility: "Avgör när du ska visa citatdelningsknappar: aldrig, endast till anonyma användare eller för alla användare. "
     create_revision_on_bulk_topic_moves: "Skapa ny version av första inlägg när ämnen flyttas till en ny kategori i bulk."
     allow_changing_staged_user_tracking: "Tillåt att aviseringsinställningar för en arrangerad användares kategori och tagg kan ändras av en administratörsanvändare."
-    use_name_for_username_suggestions: "Använd en användares fullständiga namn när det föreslås användarnamn."
     suggest_weekends_in_date_pickers: "Inkludera helger (lördag och söndag) i förslagen till datumval (inaktivera detta om du endast använder Discourse på vardagar, måndag till fredag)."
     splash_screen: "Visar en tillfällig laddningsskärm medan webbplatsens tillgångar laddas"
     default_navigation_menu_categories: "Valda kategorier visas som standard under navigeringsmenyns sektion Kategorier."
