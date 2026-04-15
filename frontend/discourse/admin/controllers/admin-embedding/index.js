@@ -26,7 +26,10 @@ export default class AdminEmbeddingIndexController extends Controller {
     const fullAppLines = this.fullAppMode
       ? `
       fullApp: true,
-      embedHeight: '800px',`
+      embedHeight: '800px',
+      // dynamicHeight: true,
+      // embedMinHeight: '400',
+      // embedMaxHeight: '900',`
       : "";
 
     const html = `<div id='discourse-comments'></div>
