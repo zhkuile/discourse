@@ -57,7 +57,6 @@
     }
   }
 
-  iframe.src = src;
   iframe.id = "discourse-embed-frame";
   iframe.width = "100%";
   iframe.frameBorder = "0";
@@ -67,7 +66,25 @@
   }
   iframe.referrerPolicy =
     DE.discourseReferrerPolicy || "no-referrer-when-downgrade";
-  comments.appendChild(iframe);
+
+  var lazyLoad = DE.fullApp && DE.lazyLoad !== false;
+
+  if (lazyLoad && "IntersectionObserver" in window) {
+    comments.appendChild(iframe);
+    var observer = new IntersectionObserver(
+      function (entries) {
+        if (entries[0].isIntersecting) {
+          iframe.src = src;
+          observer.disconnect();
+        }
+      },
+      { rootMargin: (DE.lazyLoadMargin || "1000") + "px" }
+    );
+    observer.observe(iframe);
+  } else {
+    iframe.src = src;
+    comments.appendChild(iframe);
+  }
 
   // Thanks http://amendsoft-javascript.blogspot.ca/2010/04/find-x-and-y-coordinate-of-html-control.html
   function findPosY(obj) {
