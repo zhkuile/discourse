@@ -24,6 +24,212 @@ require "yaml"
 #
 # In the first form, only the url is required.
 #
+desc "Export a theme bundle (theme + components + settings) as a zip"
+task "themes:export_bundle", %i[theme output] => :environment do |task, args|
+  theme_arg = args[:theme] || ENV["THEME_ID"]
+  output_path = args[:output] || ENV["OUTPUT"] || "/tmp/theme-bundle.zip"
+
+  if theme_arg.blank?
+    puts "Available themes:"
+    puts "-----------------"
+    Theme
+      .where(component: false)
+      .order(:name)
+      .each do |t|
+        components = t.child_themes.count
+        puts "  [#{t.id}] #{t.name} (#{components} components)"
+      end
+    puts
+    puts "Usage: rake \"themes:export_bundle[<name_or_id>,/tmp/bundle.zip]\""
+    exit 1
+  end
+
+  theme =
+    if theme_arg.to_s =~ /\A\d+\z/
+      Theme.find_by(id: theme_arg.to_i)
+    else
+      Theme.find_by("LOWER(name) = ?", theme_arg.downcase)
+    end
+
+  raise "Theme '#{theme_arg}' not found" unless theme
+
+  components = theme.child_themes.where(enabled: true)
+
+  puts "Exporting '#{theme.name}' with #{components.count} components..."
+
+  settings_count = 0
+
+  Dir.mktmpdir("theme-bundle") do |tmpdir|
+    # Export parent theme
+    theme_exporter = ThemeStore::ZipExporter.new(theme)
+    theme_exporter.with_export_dir do |theme_dir|
+      FileUtils.cp_r(theme_dir, File.join(tmpdir, "theme"))
+    end
+
+    # Collect settings overrides for parent
+    parent_settings = {}
+    current = theme.cached_settings
+    defaults = theme.cached_default_settings
+    current.each do |name, value|
+      next if name == "theme_uploads" || name == "theme_uploads_local"
+      parent_settings[name] = value if value.to_s != defaults[name].to_s
+    end
+
+    # Export each component
+    manifest_components = []
+    components_dir = File.join(tmpdir, "components")
+    FileUtils.mkdir_p(components_dir)
+
+    components.each do |comp|
+      safe_name = comp.name.downcase.gsub(/[^0-9a-z.\-]/, "-")
+      puts "  Exporting component '#{comp.name}'..."
+
+      comp_exporter = ThemeStore::ZipExporter.new(comp)
+      comp_exporter.with_export_dir do |comp_dir|
+        FileUtils.cp_r(comp_dir, File.join(components_dir, safe_name))
+      end
+
+      # Component settings overrides
+      comp_settings = {}
+      comp_current = comp.cached_settings
+      comp_defaults = comp.cached_default_settings
+      comp_current.each do |name, value|
+        next if name == "theme_uploads" || name == "theme_uploads_local"
+        comp_settings[name] = value if value.to_s != comp_defaults[name].to_s
+      end
+
+      manifest_components << {
+        "id" => comp.id,
+        "name" => comp.name,
+        "dir" => safe_name,
+        "remote_url" => comp.remote_theme&.remote_url,
+        "settings" => comp_settings,
+      }
+    end
+
+    # Write manifest
+    manifest = {
+      "name" => theme.name,
+      "theme_id" => theme.id,
+      "exported_at" => Time.now.utc.iso8601,
+      "settings" => parent_settings,
+      "components" => manifest_components,
+    }
+    File.write(File.join(tmpdir, "manifest.json"), JSON.pretty_generate(manifest))
+
+    # Package as zip
+    FileUtils.rm_f(output_path)
+    require "zip"
+    Zip::File.open(output_path, create: true) do |zipfile|
+      Dir[File.join(tmpdir, "**", "*")].each do |file|
+        next if File.directory?(file)
+        entry_name = file.sub("#{tmpdir}/", "")
+        zipfile.add(entry_name, file)
+      end
+    end
+
+    settings_count = parent_settings.size + manifest_components.sum { |c| c["settings"].size }
+  end
+
+  puts "Bundle exported to #{output_path}"
+  puts "  Theme: #{theme.name}"
+  puts "  Components: #{components.count}"
+  puts "  Settings overrides: #{settings_count}"
+end
+
+desc "Import a theme bundle (theme + components + settings) from a zip"
+task "themes:import_bundle", %i[input] => :environment do |task, args|
+  input_path = args[:input] || ENV["INPUT"]
+
+  if input_path.blank? || !File.exist?(input_path)
+    puts "Usage: rake \"themes:import_bundle[/tmp/bundle.zip]\""
+    exit 1
+  end
+
+  require "zip"
+
+  Dir.mktmpdir("theme-bundle-import") do |tmpdir|
+    Zip::File.open(input_path) do |zip_file|
+      zip_file.each do |entry|
+        dest = File.join(tmpdir, entry.name)
+        dest = Pathname.new(dest).cleanpath.to_s
+        unless dest.start_with?(tmpdir)
+          raise "Zip entry '#{entry.name}' attempts to escape extract directory"
+        end
+
+        if entry.directory?
+          FileUtils.mkdir_p(dest)
+        else
+          FileUtils.mkdir_p(File.dirname(dest))
+          File.binwrite(dest, entry.get_input_stream.read)
+        end
+      end
+    end
+
+    manifest_path = File.join(tmpdir, "manifest.json")
+    raise "No manifest.json found in bundle" unless File.exist?(manifest_path)
+    manifest = JSON.parse(File.read(manifest_path))
+
+    puts "Importing '#{manifest["name"]}' with #{manifest["components"]&.length || 0} components..."
+
+    # Import components first
+    component_id_map = {}
+    (manifest["components"] || []).each do |comp|
+      comp_dir = File.join(tmpdir, "components", comp["dir"])
+      unless Dir.exist?(comp_dir)
+        puts "  WARNING: Component directory '#{comp["dir"]}' not found, skipping"
+        next
+      end
+
+      puts "  Importing component '#{comp["name"]}'..."
+      imported = RemoteTheme.import_theme_from_directory(comp_dir)
+      component_id_map[comp["name"]] = imported.id
+
+      (comp["settings"] || {}).each do |name, value|
+        setting = imported.settings[name.to_sym]
+        if setting
+          puts "    Setting #{name}..."
+          setting.value = value
+        else
+          puts "    WARNING: Setting '#{name}' not found, skipping"
+        end
+      end
+    end
+
+    # Import the parent theme
+    theme_dir = File.join(tmpdir, "theme")
+    raise "No theme/ directory found in bundle" unless Dir.exist?(theme_dir)
+
+    puts "  Importing theme '#{manifest["name"]}'..."
+    imported_theme = RemoteTheme.import_theme_from_directory(theme_dir)
+
+    # Wire up components
+    component_id_map.each do |name, comp_id|
+      comp = Theme.find(comp_id)
+      if imported_theme.child_themes.exclude?(comp)
+        imported_theme.child_themes << comp
+        puts "  Attached component '#{name}'"
+      end
+    end
+
+    (manifest["settings"] || {}).each do |name, value|
+      setting = imported_theme.settings[name.to_sym]
+      if setting
+        puts "  Setting #{name}..."
+        setting.value = value
+      else
+        puts "  WARNING: Setting '#{name}' not found, skipping"
+      end
+    end
+
+    puts
+    puts "Bundle imported successfully!"
+    puts "  Theme: #{imported_theme.name} (id: #{imported_theme.id})"
+    puts "  Components: #{component_id_map.size}"
+    puts "  Preview: /admin/customize/themes/#{imported_theme.id}"
+  end
+end
+
 desc "Install themes & theme components"
 task "themes:install" => :environment do |task, args|
   theme_args = (STDIN.tty?) ? "" : STDIN.read
