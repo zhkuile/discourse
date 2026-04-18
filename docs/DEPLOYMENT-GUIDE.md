@@ -79,7 +79,7 @@ mkdir -p /opt/yunding-forum
 cd /opt/yunding-forum
 
 # 克隆代码（使用 prod 分支）
-git clone -b prod https://github.com/yourusername/discourse.git .
+git clone -b prod git@github.com:zhkuile/discourse.git  .
 ```
 
 ### 2. 配置环境变量

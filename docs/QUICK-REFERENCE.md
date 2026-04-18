@@ -6,7 +6,7 @@
 
 ```bash
 # 1. 克隆代码
-git clone -b prod https://github.com/yourusername/discourse.git yunding-forum
+git clone -b prod git@github.com:zhkuile/discourse.git yunding-forum
 cd yunding-forum
 
 # 2. 配置环境变量
