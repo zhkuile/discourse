@@ -1,26 +1,196 @@
+---
+title: Plugin Architecture
+short_title: Plugins
+id: project-plugin-architecture
+---
 
-## List of Discourse Plugins
+# 插件架构说明
 
-If you just want to get some plugins for your Discourse instance, check out [the plugin category](https://meta.discourse.org/c/plugin) at meta. This is the most up to date place for plugin discussion and listing.
+本文档用于说明 Discourse 的插件系统如何工作，以及插件如何与核心应用协同。
 
-If you want to be safe, use only plugins on this list of [Official Plugins](https://github.com/discourse/discourse/blob/main/lib/plugin/metadata.rb): 
+## 1. 插件系统的定位
 
-### Discourse Plugin Tutorials
+Discourse 的插件系统是平台可扩展性的核心。它让社区站点可以在不修改核心代码的前提下，增加业务功能、管理能力、UI 资源、后台任务和集成逻辑。
 
-* [Part One: Getting Started](https://meta.discourse.org/t/beginners-guide-to-creating-discourse-plugins/30515)
+从工程实现上看，插件不是“外部脚本”，而是可深度接入 Rails 应用生命周期的模块，能够参与：
 
-* [Part Two: Plugin Outlets](https://meta.discourse.org/t/beginners-guide-to-creating-discourse-plugins-part-2-plugin-outlets/31001)
+- 初始化与启动
+- 路由注册
+- 模型扩展
+- 序列化扩展
+- 事件监听
+- 后台任务
+- 搜索索引
+- 资源注入
 
-* [Part Three: Custom Site Settings](https://meta.discourse.org/t/beginners-guide-to-creating-discourse-plugins-part-3-custom-settings/31115)
+## 2. 插件目录结构
 
-* [Part Four: Git Setup](https://meta.discourse.org/t/beginners-guide-to-creating-discourse-plugins-part-4-git-setup/31272)
+一个典型插件通常包含以下内容：
 
-* [Part Five: Admin Interfaces](https://meta.discourse.org/t/beginners-guide-to-creating-discourse-plugins-part-5-admin-interfaces/31761)
+- `plugin.rb`：插件入口
+- `app/`：控制器、模型、视图、序列化器等
+- `config/locales/`：国际化文本
+- `assets/`：样式、脚本、图标
+- `lib/`：插件内部服务、引擎、扩展逻辑
+- `spec/`：测试
+- `package.json` / `tsconfig.json`：前端相关构建配置
 
-* [Part Six: Acceptance Tests](https://meta.discourse.org/t/beginner-s-guide-to-creating-discourse-plugins-part-6-acceptance-tests/32619)
+这种结构使插件既能像一个独立小应用一样组织代码，又能无缝嵌入主应用。
 
-### Simple Demonstration Plugins
+## 3. 插件初始化流程
 
-- [Manipulating text in the composer](https://meta.discourse.org/t/plugin-tutorial-1-how-to-manipulate-the-text-in-the-composer/10925)
- 
-- [Display plugin outlet locations](https://meta.discourse.org/t/plugin-outlet-locations/29589)
+### 3.1 启动阶段
+
+插件通常在应用启动期间被加载，核心应用会在初始化阶段扫描插件目录并引入相关入口文件。
+
+### 3.2 配置阶段
+
+插件可通过站点设置控制启用状态，例如：
+
+- `enabled_site_setting`
+- 默认配置项注册
+- 自定义 setting provider
+
+### 3.3 after_initialize 阶段
+
+插件的大部分挂载逻辑通常在 `after_initialize` 中完成，因为此时 Rails、模型、路由、序列化器等基础设施已经准备好。
+
+插件常见的初始化动作包括：
+
+- 注册管理路由
+- 注册事件监听器
+- 扩展模型方法
+- 注册搜索索引
+- 增加 serializer 字段
+- 注入后台任务
+
+## 4. 插件扩展方式
+
+### 4.1 资源注入
+
+插件可以注册：
+
+- CSS
+- JS
+- SVG 图标
+- 主题资源
+
+用于扩展页面样式和交互能力。
+
+### 4.2 路由扩展
+
+插件可以添加：
+
+- 管理后台路由
+- API 路由
+- 页面路由
+- 特定功能入口
+
+这使插件能独立提供完整功能页面。
+
+### 4.3 模型扩展
+
+插件常使用 `prepend` 或扩展模块方式增强核心模型，例如：
+
+- 为用户增加字段
+- 为帖子增加行为
+- 为群组增加规则
+- 为书签、审核对象、通知对象增加新逻辑
+
+### 4.4 Serializer 扩展
+
+插件可以向 API 输出中添加字段，从而让前端获得插件提供的数据。
+
+### 4.5 事件驱动
+
+Discourse 提供事件系统，插件可以订阅核心事件，例如：
+
+- 用户首次登录
+- 用户加入群组
+- 用户离开群组
+- 帖子创建、更新、删除
+- 站点设置变化
+
+事件驱动机制让插件不需要侵入核心业务流程就能响应系统状态变化。
+
+### 4.6 搜索索引
+
+插件可以注册独立索引，参与站内搜索体系。
+
+### 4.7 后台任务
+
+插件可以定义自己的 job，用于异步处理复杂任务，例如同步、索引、清理、导出或自动化流程执行。
+
+## 5. 插件与核心的协作模型
+
+插件和核心之间的关系是“扩展而非隔离”。典型协作方式包括：
+
+- 插件读取核心模型
+- 插件通过回调修改核心行为
+- 插件注册自己的服务对象
+- 核心在运行时调用插件扩展点
+
+这意味着插件开发需要理解核心架构，否则容易在权限、数据一致性和性能方面引入问题。
+
+## 6. 典型插件示例
+
+### 6.1 Chat 插件
+
+`plugins/chat` 是一个很好的深度集成示例。
+
+它的能力包括：
+
+- 提供原生聊天体验
+- 注册聊天相关样式与图标
+- 扩展用户、群组、通知、书签和审核流程
+- 注册聊天消息搜索索引
+- 注册 onebox 处理器
+- 为当前用户增加聊天相关字段
+
+它说明插件可以把自己做成几乎独立的业务子系统，同时仍然复用核心用户体系和权限体系。
+
+### 6.2 Automation 插件
+
+`plugins/automation` 体现了事件驱动和规则引擎式扩展。
+
+它的能力包括：
+
+- 监听用户登录、加群、退群等事件
+- 触发自动化脚本
+- 提供管理后台配置入口
+- 注册 API Key 权限作用域
+
+它说明插件不只是增加页面，也可以成为系统自动化能力的一部分。
+
+## 7. 插件开发约定
+
+在 Discourse 中开发插件时，通常需要遵循以下约定：
+
+- 尽量使用公开扩展点，不直接硬改核心
+- 使用站点设置控制功能开关
+- 保持插件内部逻辑独立清晰
+- 对权限和数据一致性保持谨慎
+- 需要时为插件能力增加测试
+- 避免过度依赖核心实现细节
+
+## 8. 插件常见风险
+
+插件系统灵活，但也带来一些架构风险：
+
+- **升级风险**：核心改动可能影响插件补丁
+- **耦合风险**：过度依赖内部实现会降低兼容性
+- **性能风险**：插件监听大量事件时可能影响请求延迟
+- **维护风险**：多个插件可能同时修改同一对象
+
+因此，插件应该尽量通过标准扩展点接入，而不是任意 patch 内部逻辑。
+
+## 9. 插件架构总结
+
+Discourse 插件架构的核心特点是：
+
+- 与核心深度集成
+- 能扩展业务、UI 和基础设施
+- 支持事件驱动和资源注入
+- 适合构建官方功能包和第三方扩展
+
+它是 Discourse 长期保持活力和适配能力的关键。
