@@ -86,7 +86,7 @@ main() {
             print_step "Initializing database..."
             
             print_info "Creating database..."
-            docker compose exec -T app bundle exec rake db:create
+            docker exec -it yunding-postgres psql -U ${POSTGRES_USER:-discourse} -d postgres -c "CREATE DATABASE ${POSTGRES_DB:-discourse};" || true
             
             print_info "Running migrations..."
             docker compose exec -T app bundle exec rake db:migrate

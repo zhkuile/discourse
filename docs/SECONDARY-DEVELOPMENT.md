@@ -495,3 +495,63 @@ crontab -e
 ---
 
 **开始你的二次开发之旅！** 🚀
+
+一键部署：
+# 1. 安装 Docker
+curl -fsSL https://get.docker.com | sh
+sudo usermod -aG docker $USER
+newgrp docker
+
+# 2. 克隆代码
+git clone -b prod https://github.com/yourusername/discourse.git yunding-forum
+cd yunding-forum
+
+# 3. 配置环境变量
+cp .env.example .env
+nano .env  # 修改必要配置
+
+# 4. 一键部署
+chmod +x deploy-dev.sh
+./deploy-dev.sh init
+./deploy-dev.sh init-db
+
+# 5. 访问论坛
+# http://localhost:3000
+
+
+更新开发流程：
+# 在开发环境
+git checkout prod
+git pull origin prod
+# ... 编写代码 ...
+git add .
+git commit -m "Add new feature"
+git push origin prod
+
+
+# 在服务器上执行
+./deploy-dev.sh update
+
+常用命令
+
+# 初始化部署
+./deploy-dev.sh init
+
+# 初始化数据库
+./deploy-dev.sh init-db
+
+# 更新部署
+./deploy-dev.sh update
+
+# 查看日志
+./deploy-dev.sh logs
+
+# 进入容器
+./deploy-dev.sh bash
+
+# Rails console
+./deploy-dev.sh console
+
+# 创建备份
+./deploy-dev.sh backup
+

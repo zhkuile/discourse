@@ -33,7 +33,6 @@ USER discourse
 
 # 安装 Ruby 依赖（包含必要的开发依赖）
 RUN bundle config set --local deployment 'true' && \
-    bundle config set --local without 'test' && \
     bundle install --jobs 4 --retry 3
 
 # 安装 Node.js 依赖

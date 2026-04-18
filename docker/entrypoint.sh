@@ -11,11 +11,14 @@ export RACK_ENV=${RACK_ENV:-production}
 echo "⏳ Waiting for database..."
 max_attempts=30
 attempt=1
+
 while [ $attempt -le $max_attempts ]; do
-  if bundle exec rake db:version > /dev/null 2>&1; then
-    echo "✅ Database is ready!"
+  # 尝试连接数据库
+  if PGPASSWORD=${DISCOURSE_DB_PASSWORD:-discourse_password} psql -h ${DISCOURSE_DB_HOST:-postgres} -U ${DISCOURSE_DB_USERNAME:-discourse} -d ${DISCOURSE_DB_NAME:-discourse} -c "SELECT 1" > /dev/null 2>&1; then
+    echo "✅ Database connection successful!"
     break
   fi
+  
   echo "Database is unavailable - attempt $attempt/$max_attempts"
   sleep 2
   attempt=$((attempt + 1))
@@ -23,7 +26,20 @@ done
 
 if [ $attempt -gt $max_attempts ]; then
   echo "❌ Database connection failed after $max_attempts attempts"
-  exit 1
+  echo "Checking database status..."
+  
+  # 尝试连接到 postgres 数据库（默认存在）
+  if PGPASSWORD=${DISCOURSE_DB_PASSWORD:-discourse_password} psql -h ${DISCOURSE_DB_HOST:-postgres} -U ${DISCOURSE_DB_USERNAME:-discourse} -d postgres -c "SELECT 1" > /dev/null 2>&1; then
+    echo "✅ Can connect to postgres database. Creating discourse database..."
+    
+    # 创建数据库
+    PGPASSWORD=${DISCOURSE_DB_PASSWORD:-discourse_password} psql -h ${DISCOURSE_DB_HOST:-postgres} -U ${DISCOURSE_DB_USERNAME:-discourse} -d postgres -c "CREATE DATABASE ${DISCOURSE_DB_NAME:-discourse};" || true
+    
+    echo "✅ Database created!"
+  else
+    echo "❌ Cannot connect to PostgreSQL at all. Please check database configuration."
+    exit 1
+  fi
 fi
 
 # 运行数据库迁移
