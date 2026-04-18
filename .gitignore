@@ -141,3 +141,24 @@ frontend/discourse-i18n/src/index.d.ts.map
 /.cursor
 .playwright-mcp
 /frontend/discourse-types/dts-generator.js
+
+# 云顶论坛自定义忽略规则
+
+# 环境变量文件
+.env
+.env.local
+.env.production
+
+# 数据目录
+/data/
+/docker/ssl/
+
+# Docker 相关
+docker-compose.override.yml
+
+# 备份文件
+*.sql.gz
+*.tar.gz
+
+# 日志文件
+*.log

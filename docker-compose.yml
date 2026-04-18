@@ -1,0 +1,180 @@
+# 云顶论坛 Docker Compose 配置
+# 用于生产环境部署
+
+version: '3.8'
+
+services:
+  # PostgreSQL 数据库
+  postgres:
+    image: postgres:15-alpine
+    container_name: yunding-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-discourse}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-discourse_password}
+      POSTGRES_DB: ${POSTGRES_DB:-discourse}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - yunding-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-discourse}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis 缓存
+  redis:
+    image: redis:7-alpine
+    container_name: yunding-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    networks:
+      - yunding-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # 云顶论坛主应用
+  app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    image: yunding-forum:latest
+    container_name: yunding-app
+    restart: unless-stopped
+    environment:
+      # 数据库配置
+      DATABASE_URL: postgres://${POSTGRES_USER:-discourse}:${POSTGRES_PASSWORD:-discourse_password}@postgres:5432/${POSTGRES_DB:-discourse}
+      REDIS_URL: redis://redis:6379
+      
+      # Rails 配置
+      RAILS_ENV: production
+      RACK_ENV: production
+      
+      # 站点配置
+      DISCOURSE_HOSTNAME: ${DISCOURSE_HOSTNAME:-localhost}
+      DISCOURSE_DB_HOST: postgres
+      DISCOURSE_DB_NAME: ${POSTGRES_DB:-discourse}
+      DISCOURSE_DB_USERNAME: ${POSTGRES_USER:-discourse}
+      DISCOURSE_DB_PASSWORD: ${POSTGRES_PASSWORD:-discourse_password}
+      DISCOURSE_REDIS_HOST: redis
+      
+      # 邮件配置
+      DISCOURSE_SMTP_ADDRESS: ${SMTP_ADDRESS:-}
+      DISCOURSE_SMTP_PORT: ${SMTP_PORT:-587}
+      DISCOURSE_SMTP_USER_NAME: ${SMTP_USER:-}
+      DISCOURSE_SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      
+      # 管理员配置（首次启动时创建）
+      CREATE_ADMIN: ${CREATE_ADMIN:-false}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+      
+      # 密钥（生产环境必须修改！）
+      SECRET_KEY_BASE: ${SECRET_KEY_BASE:-change_me_in_production}
+      
+    volumes:
+      # 挂载代码目录（支持热更新）
+      - .:/var/www/discourse
+      
+      # 持久化数据目录
+      - ./data/uploads:/var/www/discourse/public/uploads
+      - ./data/backups:/var/www/discourse/public/backups
+      - ./data/logs:/var/www/discourse/log
+      
+      # 排除不需要挂载的目录
+      - /var/www/discourse/node_modules
+      - /var/www/discourse/tmp
+      
+    ports:
+      - "${APP_PORT:-3000}:3000"
+      
+    networks:
+      - yunding-network
+      
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+        
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # Sidekiq 后台任务处理
+  sidekiq:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    image: yunding-forum:latest
+    container_name: yunding-sidekiq
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER:-discourse}:${POSTGRES_PASSWORD:-discourse_password}@postgres:5432/${POSTGRES_DB:-discourse}
+      REDIS_URL: redis://redis:6379
+      RAILS_ENV: production
+      RACK_ENV: production
+      DISCOURSE_HOSTNAME: ${DISCOURSE_HOSTNAME:-localhost}
+      DISCOURSE_DB_HOST: postgres
+      DISCOURSE_DB_NAME: ${POSTGRES_DB:-discourse}
+      DISCOURSE_DB_USERNAME: ${POSTGRES_USER:-discourse}
+      DISCOURSE_DB_PASSWORD: ${POSTGRES_PASSWORD:-discourse_password}
+      DISCOURSE_REDIS_HOST: redis
+      SECRET_KEY_BASE: ${SECRET_KEY_BASE:-change_me_in_production}
+      
+    volumes:
+      - .:/var/www/discourse
+      - ./data/uploads:/var/www/discourse/public/uploads
+      - ./data/backups:/var/www/discourse/public/backups
+      - ./data/logs:/var/www/discourse/log
+      - /var/www/discourse/node_modules
+      - /var/www/discourse/tmp
+      
+    networks:
+      - yunding-network
+      
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      app:
+        condition: service_healthy
+        
+    command: bundle exec sidekiq -e production
+
+  # Nginx 反向代理（可选）
+  nginx:
+    image: nginx:alpine
+    container_name: yunding-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_HTTP_PORT:-80}:80"
+      - "${NGINX_HTTPS_PORT:-443}:443"
+    volumes:
+      - ./docker/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./docker/ssl:/etc/nginx/ssl:ro
+      - ./data/uploads:/var/www/discourse/public/uploads:ro
+    networks:
+      - yunding-network
+    depends_on:
+      - app
+
+networks:
+  yunding-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
