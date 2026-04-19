@@ -92,7 +92,7 @@ services:
       - /var/www/discourse/public/assets
       
     ports:
-      - "${APP_PORT:-3000}:3000"
+      - "${APP_PORT:-3200}:3000"
       
     networks:
       - yunding-network

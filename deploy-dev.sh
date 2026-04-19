@@ -86,7 +86,7 @@ main() {
             print_info "Next steps:"
             print_info "  1. Initialize database: ./deploy-dev.sh init-db"
             print_info "  2. View logs: ./deploy-dev.sh logs"
-            print_info "  3. Access forum: http://localhost:${APP_PORT:-3000}"
+            print_info "  3. Access forum: http://localhost:${APP_PORT:-3200}"
             ;;
             
         init-db)
@@ -132,7 +132,7 @@ main() {
             docker compose exec -T app bundle exec rake db:migrate
             
             print_info "✅ Update completed!"
-            print_info "Access forum: http://localhost:${APP_PORT:-3000}"
+            print_info "Access forum: http://localhost:${APP_PORT:-3200}"
             ;;
             
         start)
