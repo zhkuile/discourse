@@ -18,7 +18,9 @@ run_as_app_user() {
   if [ "$(id -un)" = "$APP_USER" ]; then
     "$@"
   else
-    su "$APP_USER" -s /bin/bash -c "cd '$APP_ROOT' && exec \"\$@\"" -- "$@"
+    local quoted_cmd
+    printf -v quoted_cmd '%q ' "$@"
+    su "$APP_USER" -s /bin/bash -c "cd '$APP_ROOT' && $quoted_cmd"
   fi
 }
 
