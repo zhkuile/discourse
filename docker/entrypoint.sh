@@ -47,10 +47,6 @@ if [ $attempt -gt $max_attempts ]; then
   fi
 fi
 
-# 运行数据库迁移
-echo "📦 Running database migrations..."
-bundle exec rake db:migrate
-
 # 预编译资产（如果需要）
 if [ ! -f "public/assets/.sprockets-manifest-*.json" ] 2>/dev/null; then
   echo "📦 Precompiling assets (this may take a few minutes)..."

@@ -5,6 +5,14 @@
 
 set -e
 
+# 自动加载 .env，避免脚本依赖当前 shell 的导出变量
+if [ -f .env ]; then
+    set -a
+    # shellcheck disable=SC1091
+    source .env
+    set +a
+fi
+
 echo "🚀 Yunding Forum Development Deployment Script"
 echo "================================================"
 
@@ -92,8 +100,14 @@ main() {
         init-db)
             print_step "Initializing database..."
             
-            print_info "Creating database..."
-            docker exec -it yunding-postgres psql -U "${POSTGRES_USER:-discourse}" -d postgres -c "CREATE DATABASE \"${POSTGRES_DB:-discourse}\";" || true
+            print_info "Checking whether database exists..."
+            DB_EXISTS=$(docker exec -it yunding-postgres psql -U "${POSTGRES_USER}" -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname='${POSTGRES_DB}'")
+            if [ "$DB_EXISTS" = "1" ]; then
+                print_info "Database ${POSTGRES_DB} already exists. Skipping creation."
+            else
+                print_info "Creating database..."
+                docker exec -it yunding-postgres psql -U "${POSTGRES_USER}" -d postgres -c "CREATE DATABASE \"${POSTGRES_DB}\";"
+            fi
             
             print_info "Running migrations..."
             docker compose exec -T app bundle exec rake db:migrate
