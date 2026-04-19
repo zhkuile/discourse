@@ -33,7 +33,8 @@ ensure_writable_paths() {
     "$APP_ROOT/public/assets" \
     "$APP_ROOT/public/backups" \
     "$APP_ROOT/public/plugins" \
-    "$APP_ROOT/public/uploads"
+    "$APP_ROOT/public/uploads" \
+    "$APP_ROOT/app/assets/generated"
 
   chown -R "$APP_USER:$APP_USER" \
     "$APP_ROOT/tmp" \
@@ -41,7 +42,13 @@ ensure_writable_paths() {
     "$APP_ROOT/public/assets" \
     "$APP_ROOT/public/backups" \
     "$APP_ROOT/public/plugins" \
-    "$APP_ROOT/public/uploads"
+    "$APP_ROOT/public/uploads" \
+    "$APP_ROOT/app/assets/generated"
+
+  if [ -d "$APP_ROOT/plugins" ]; then
+    find "$APP_ROOT/plugins" -type d \( -name public -o -path '*/assets' -o -path '*/assets/*' \) -exec chown -R "$APP_USER:$APP_USER" {} + 2>/dev/null || true
+    chown -R "$APP_USER:$APP_USER" "$APP_ROOT/plugins" 2>/dev/null || true
+  fi
 }
 
 # 等待数据库就绪
