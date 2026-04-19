@@ -5,6 +5,28 @@
 
 set -e
 
+resolve_compose_cmd() {
+    if docker compose version &> /dev/null; then
+        echo "docker compose"
+    elif command -v docker-compose &> /dev/null; then
+        echo "docker-compose"
+    else
+        echo ""
+    fi
+}
+
+run_compose() {
+    local compose_cmd
+    compose_cmd=$(resolve_compose_cmd)
+    if [ -z "$compose_cmd" ]; then
+        print_error "Docker Compose is not installed. Please install Docker Compose first."
+        exit 1
+    fi
+    $compose_cmd "$@"
+}
+
+# 统一使用 .env 中的数据库配置，避免密码包含特殊字符时拼接 DATABASE_URL 出错
+
 echo "🚀 Yunding Forum Deployment Script"
 echo "=================================="
 
@@ -92,12 +114,8 @@ create_data_directories() {
 build_image() {
     print_info "Building Docker image..."
     
-    # 使用 docker-compose 构建
-    if docker compose version &> /dev/null; then
-        docker compose build --no-cache
-    else
-        docker-compose build --no-cache
-    fi
+    # 使用统一的 compose 命令构建
+    run_compose build --no-cache
     
     print_info "✅ Docker image built successfully."
 }
@@ -106,11 +124,7 @@ build_image() {
 stop_containers() {
     print_info "Stopping old containers..."
     
-    if docker compose version &> /dev/null; then
-        docker compose down
-    else
-        docker-compose down
-    fi
+    run_compose down
     
     print_info "✅ Old containers stopped."
 }
@@ -119,11 +133,7 @@ stop_containers() {
 start_containers() {
     print_info "Starting new containers..."
     
-    if docker compose version &> /dev/null; then
-        docker compose up -d
-    else
-        docker-compose up -d
-    fi
+    run_compose up -d
     
     print_info "✅ New containers started."
 }
@@ -141,7 +151,11 @@ wait_for_service() {
             return 0
         fi
         
-        echo "Attempt $attempt/$max_attempts - Service not ready yet..."
+        if run_compose ps postgres | grep -q "healthy"; then
+            echo "Attempt $attempt/$max_attempts - App not ready yet..."
+        else
+            echo "Attempt $attempt/$max_attempts - Database not healthy yet..."
+        fi
         sleep 5
         attempt=$((attempt + 1))
     done
@@ -154,11 +168,29 @@ wait_for_service() {
 show_logs() {
     print_info "Showing application logs (Ctrl+C to exit)..."
     
-    if docker compose version &> /dev/null; then
-        docker compose logs -f app
-    else
-        docker-compose logs -f app
-    fi
+    run_compose logs -f app
+}
+
+# 等待数据库就绪
+wait_for_database() {
+    print_info "Checking database health..."
+    
+    local max_attempts=24
+    local attempt=1
+    
+    while [ $attempt -le $max_attempts ]; do
+        if run_compose ps postgres | grep -q "healthy"; then
+            print_info "✅ Database is healthy."
+            return 0
+        fi
+        
+        echo "Attempt $attempt/$max_attempts - Database not healthy yet..."
+        sleep 5
+        attempt=$((attempt + 1))
+    done
+    
+    print_error "Database failed to become healthy within timeout."
+    return 1
 }
 
 # 清理旧镜像
@@ -170,6 +202,30 @@ cleanup_old_images() {
     print_info "✅ Cleanup completed."
 }
 
+# 记录当前运行中的镜像，用于失败回滚
+capture_current_image() {
+    CURRENT_APP_IMAGE_ID="$(run_compose images -q app 2>/dev/null || true)"
+    if [ -n "$CURRENT_APP_IMAGE_ID" ]; then
+        print_info "Captured current app image: $CURRENT_APP_IMAGE_ID"
+    else
+        print_warn "No current app image found for rollback."
+    fi
+}
+
+# 回滚到部署前镜像
+rollback_deployment() {
+    if [ -n "$CURRENT_APP_IMAGE_ID" ]; then
+        print_warn "Rolling back to previous app image..."
+        docker tag "$CURRENT_APP_IMAGE_ID" yunding-forum:latest
+        run_compose up -d --no-build --force-recreate app
+        run_compose up -d --no-build --force-recreate sidekiq
+        wait_for_service || true
+        print_warn "Rollback finished. Check application logs for details."
+    else
+        print_error "Rollback skipped because no previous image was captured."
+    fi
+}
+
 # 主函数
 main() {
     case "$1" in
@@ -178,10 +234,21 @@ main() {
             check_env_file
             pull_latest_code
             create_data_directories
+            capture_current_image
             build_image
+            if ! wait_for_database; then
+                rollback_deployment
+                exit 1
+            fi
             stop_containers
-            start_containers
-            wait_for_service
+            if ! start_containers; then
+                rollback_deployment
+                exit 1
+            fi
+            if ! wait_for_service; then
+                rollback_deployment
+                exit 1
+            fi
             cleanup_old_images
             print_info "🎉 Deployment completed successfully!"
             print_info "Visit: http://localhost:${APP_PORT:-3000}"
@@ -193,8 +260,14 @@ main() {
             ;;
         start)
             check_dependencies
-            start_containers
-            wait_for_service
+            wait_for_database
+            if ! start_containers; then
+                exit 1
+            fi
+            if ! wait_for_service; then
+                rollback_deployment
+                exit 1
+            fi
             print_info "✅ Service started."
             ;;
         stop)
@@ -204,28 +277,28 @@ main() {
             ;;
         restart)
             check_dependencies
+            capture_current_image
+            wait_for_database
             stop_containers
-            start_containers
-            wait_for_service
+            if ! start_containers; then
+                rollback_deployment
+                exit 1
+            fi
+            if ! wait_for_service; then
+                rollback_deployment
+                exit 1
+            fi
             print_info "✅ Service restarted."
             ;;
         logs)
             show_logs
             ;;
         status)
-            if docker compose version &> /dev/null; then
-                docker compose ps
-            else
-                docker-compose ps
-            fi
+            run_compose ps
             ;;
         backup)
             print_info "Creating backup..."
-            if docker compose version &> /dev/null; then
-                docker compose exec app bundle exec rake backup:create
-            else
-                docker-compose exec app bundle exec rake backup:create
-            fi
+            run_compose exec app bundle exec rake backup:create
             print_info "✅ Backup created."
             ;;
         *)

@@ -7,6 +7,11 @@ echo "🚀 Starting Yunding Forum..."
 export RAILS_ENV=${RAILS_ENV:-production}
 export RACK_ENV=${RACK_ENV:-production}
 
+DB_HOST=${DISCOURSE_DB_HOST:-postgres}
+DB_NAME=${DISCOURSE_DB_NAME:-discourse}
+DB_USER=${DISCOURSE_DB_USERNAME:-discourse}
+DB_PASSWORD=${DISCOURSE_DB_PASSWORD:-discourse_password}
+
 # 等待数据库就绪
 echo "⏳ Waiting for database..."
 max_attempts=30
@@ -14,7 +19,7 @@ attempt=1
 
 while [ $attempt -le $max_attempts ]; do
   # 尝试连接数据库
-  if PGPASSWORD=${DISCOURSE_DB_PASSWORD:-discourse_password} psql -h ${DISCOURSE_DB_HOST:-postgres} -U ${DISCOURSE_DB_USERNAME:-discourse} -d ${DISCOURSE_DB_NAME:-discourse} -c "SELECT 1" > /dev/null 2>&1; then
+  if PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -U "$DB_USER" -d "$DB_NAME" -c "SELECT 1" > /dev/null 2>&1; then
     echo "✅ Database connection successful!"
     break
   fi
@@ -29,11 +34,11 @@ if [ $attempt -gt $max_attempts ]; then
   echo "Checking database status..."
   
   # 尝试连接到 postgres 数据库（默认存在）
-  if PGPASSWORD=${DISCOURSE_DB_PASSWORD:-discourse_password} psql -h ${DISCOURSE_DB_HOST:-postgres} -U ${DISCOURSE_DB_USERNAME:-discourse} -d postgres -c "SELECT 1" > /dev/null 2>&1; then
-    echo "✅ Can connect to postgres database. Creating discourse database..."
+  if PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -U "$DB_USER" -d postgres -c "SELECT 1" > /dev/null 2>&1; then
+    echo "✅ Can connect to postgres database. Creating database $DB_NAME..."
     
     # 创建数据库
-    PGPASSWORD=${DISCOURSE_DB_PASSWORD:-discourse_password} psql -h ${DISCOURSE_DB_HOST:-postgres} -U ${DISCOURSE_DB_USERNAME:-discourse} -d postgres -c "CREATE DATABASE ${DISCOURSE_DB_NAME:-discourse};" || true
+    PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -U "$DB_USER" -d postgres -c "CREATE DATABASE \"$DB_NAME\";" || true
     
     echo "✅ Database created!"
   else

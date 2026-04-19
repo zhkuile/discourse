@@ -68,7 +68,14 @@ main() {
             # 启动数据库
             print_info "Starting database services..."
             docker compose up -d postgres redis
-            sleep 10
+            
+            print_info "Waiting for database to become healthy..."
+            for i in $(seq 1 30); do
+                if docker compose ps postgres | grep -q "healthy"; then
+                    break
+                fi
+                sleep 2
+            done
             
             # 启动应用
             print_info "Starting application..."
@@ -86,7 +93,7 @@ main() {
             print_step "Initializing database..."
             
             print_info "Creating database..."
-            docker exec -it yunding-postgres psql -U ${POSTGRES_USER:-discourse} -d postgres -c "CREATE DATABASE ${POSTGRES_DB:-discourse};" || true
+            docker exec -it yunding-postgres psql -U "${POSTGRES_USER:-discourse}" -d postgres -c "CREATE DATABASE \"${POSTGRES_DB:-discourse}\";" || true
             
             print_info "Running migrations..."
             docker compose exec -T app bundle exec rake db:migrate

@@ -1,7 +1,7 @@
 # 云顶论坛生产环境 Docker 镜像
 # 基于 Discourse 官方开发镜像，支持二次开发
 
-FROM discourse/discourse_dev:20260209-1300
+FROM discourse/discourse_dev:20260331-0028
 
 LABEL maintainer="ydstack <contact@ydstack.com>"
 LABEL description="Yunding Forum - Professional community for Big Data, AI, and Web3"
