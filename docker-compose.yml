@@ -76,18 +76,16 @@ services:
       SECRET_KEY_BASE: ${SECRET_KEY_BASE:-change_me_in_production}
       
     volumes:
-      # 挂载代码目录（支持热更新）
-      - .:/var/www/discourse
-      
-      # 持久化数据目录
+      # 持久化运行时数据目录
       - ./data/uploads:/var/www/discourse/public/uploads
       - ./data/backups:/var/www/discourse/public/backups
       - ./data/logs:/var/www/discourse/log
       
-      # 排除不需要挂载的目录（使用匿名卷）
-      - /var/www/discourse/node_modules
-      - /var/www/discourse/tmp
-      - /var/www/discourse/public/assets
+      # 运行时生成内容使用命名卷，避免宿主挂载导致权限和跨设备链接问题
+      - discourse_tmp:/var/www/discourse/tmp
+      - discourse_assets:/var/www/discourse/public/assets
+      - discourse_fonts:/var/www/discourse/public/fonts
+      - discourse_generated_assets:/var/www/discourse/app/assets/generated
       
     ports:
       - "${APP_PORT:-3000}:3000"
@@ -129,13 +127,13 @@ services:
       SECRET_KEY_BASE: ${SECRET_KEY_BASE:-change_me_in_production}
       
     volumes:
-      - .:/var/www/discourse
       - ./data/uploads:/var/www/discourse/public/uploads
       - ./data/backups:/var/www/discourse/public/backups
       - ./data/logs:/var/www/discourse/log
-      - /var/www/discourse/node_modules
-      - /var/www/discourse/tmp
-      - /var/www/discourse/public/assets
+      - discourse_tmp:/var/www/discourse/tmp
+      - discourse_assets:/var/www/discourse/public/assets
+      - discourse_fonts:/var/www/discourse/public/fonts
+      - discourse_generated_assets:/var/www/discourse/app/assets/generated
       
     networks:
       - yunding-network
@@ -158,4 +156,12 @@ volumes:
   postgres_data:
     driver: local
   redis_data:
+    driver: local
+  discourse_tmp:
+    driver: local
+  discourse_assets:
+    driver: local
+  discourse_fonts:
+    driver: local
+  discourse_generated_assets:
     driver: local
