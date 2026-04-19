@@ -5,6 +5,26 @@
 
 set -e
 
+resolve_compose_cmd() {
+    if docker compose version &> /dev/null; then
+        echo "docker compose"
+    elif command -v docker-compose &> /dev/null; then
+        echo "docker-compose"
+    else
+        echo ""
+    fi
+}
+
+run_compose() {
+    local compose_cmd
+    compose_cmd=$(resolve_compose_cmd)
+    if [ -z "$compose_cmd" ]; then
+        print_error "Docker Compose is not installed. Please install Docker Compose first."
+        exit 1
+    fi
+    $compose_cmd "$@"
+}
+
 # 自动加载 .env，避免脚本依赖当前 shell 的导出变量
 if [ -f .env ]; then
     set -a
@@ -71,23 +91,31 @@ main() {
             
             # 构建镜像
             print_info "Building Docker image (this may take 10-15 minutes)..."
-            docker compose build
+            run_compose build
             
             # 启动数据库
             print_info "Starting database services..."
-            docker compose up -d postgres redis
+            run_compose up -d postgres redis
             
             print_info "Waiting for database to become healthy..."
             for i in $(seq 1 30); do
-                if docker compose ps postgres | grep -q "healthy"; then
+                if run_compose ps postgres | grep -q "healthy"; then
                     break
                 fi
                 sleep 2
             done
             
-            # 启动应用
-            print_info "Starting application..."
-            docker compose up -d app
+            # 启动应用和 Sidekiq
+            print_info "Starting application services..."
+            run_compose up -d app sidekiq
+            
+            print_info "Waiting for app container to stay up..."
+            sleep 8
+            if run_compose ps app | grep -Eq "Restarting|Exit|unhealthy"; then
+                print_error "App container failed during startup. Showing recent logs:"
+                run_compose logs --tail=120 app
+                exit 1
+            fi
             
             print_info "✅ Initialization completed!"
             print_info ""
@@ -101,22 +129,31 @@ main() {
             print_step "Initializing database..."
             
             print_info "Checking whether database exists..."
-            DB_EXISTS=$(docker exec -it yunding-postgres psql -U "${POSTGRES_USER}" -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname='${POSTGRES_DB}'")
+            DB_EXISTS=$(docker exec yunding-postgres psql -U "${POSTGRES_USER}" -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname='${POSTGRES_DB}'")
             if [ "$DB_EXISTS" = "1" ]; then
                 print_info "Database ${POSTGRES_DB} already exists. Skipping creation."
             else
                 print_info "Creating database..."
-                docker exec -it yunding-postgres psql -U "${POSTGRES_USER}" -d postgres -c "CREATE DATABASE \"${POSTGRES_DB}\";"
+                docker exec yunding-postgres psql -U "${POSTGRES_USER}" -d postgres -c "CREATE DATABASE \"${POSTGRES_DB}\";"
+            fi
+
+            print_info "Ensuring app container is running before migrations..."
+            run_compose up -d app
+            sleep 5
+            if run_compose ps app | grep -Eq "Restarting|Exit|unhealthy"; then
+                print_error "App container is not healthy enough to run migrations. Showing recent logs:"
+                run_compose logs --tail=120 app
+                exit 1
             fi
             
             print_info "Running migrations..."
-            docker compose exec -T app bundle exec rake db:migrate
+            run_compose exec -T app bundle exec rake db:migrate
             
             print_info "Seeding database..."
-            docker compose exec -T app bundle exec rake db:seed_fu
+            run_compose exec -T app bundle exec rake db:seed_fu
             
             print_info "Creating admin account..."
-            docker compose exec -it app bundle exec rake admin:create
+            run_compose exec app bundle exec rake admin:create
             
             print_info "✅ Database initialized!"
             ;;
@@ -130,20 +167,26 @@ main() {
             
             # 重新构建镜像
             print_info "Rebuilding Docker image..."
-            docker compose build
+            run_compose build
             
             # 重启服务
             print_info "Restarting services..."
-            docker compose down
-            docker compose up -d
+            run_compose down
+            run_compose up -d
             
             # 等待服务就绪
             print_info "Waiting for services to be ready..."
             sleep 10
             
+            if run_compose ps app | grep -Eq "Restarting|Exit|unhealthy"; then
+                print_error "App container failed after update. Showing recent logs:"
+                run_compose logs --tail=120 app
+                exit 1
+            fi
+            
             # 运行迁移
             print_info "Running database migrations..."
-            docker compose exec -T app bundle exec rake db:migrate
+            run_compose exec -T app bundle exec rake db:migrate
             
             print_info "✅ Update completed!"
             print_info "Access forum: http://localhost:${APP_PORT:-3200}"
@@ -151,44 +194,44 @@ main() {
             
         start)
             print_info "Starting services..."
-            docker compose up -d
+            run_compose up -d
             print_info "✅ Services started!"
             ;;
             
         stop)
             print_info "Stopping services..."
-            docker compose down
+            run_compose down
             print_info "✅ Services stopped!"
             ;;
             
         restart)
             print_info "Restarting services..."
-            docker compose restart
+            run_compose restart
             print_info "✅ Services restarted!"
             ;;
             
         logs)
-            docker compose logs -f app
+            run_compose logs -f app
             ;;
             
         console)
             print_info "Opening Rails console..."
-            docker compose exec app bundle exec rails console
+            run_compose exec app bundle exec rails console
             ;;
             
         bash)
             print_info "Opening bash shell in container..."
-            docker compose exec app bash
+            run_compose exec app bash
             ;;
             
         backup)
             print_info "Creating backup..."
-            docker compose exec app bundle exec rake backup:create
+            run_compose exec app bundle exec rake backup:create
             print_info "✅ Backup created!"
             ;;
             
         status)
-            docker compose ps
+            run_compose ps
             ;;
             
         clean)
@@ -196,7 +239,7 @@ main() {
             read -p "Are you sure? (y/N) " -n 1 -r
             echo
             if [[ $REPLY =~ ^[Yy]$ ]]; then
-                docker compose down -v
+                run_compose down -v
                 docker system prune -a
                 print_info "✅ Cleanup completed!"
             fi

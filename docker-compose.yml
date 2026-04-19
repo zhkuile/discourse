@@ -1,8 +1,6 @@
 # 云顶论坛 Docker Compose 配置
 # 用于生产环境部署，支持二次开发
 
-version: '3.8'
-
 services:
   # PostgreSQL 数据库
   postgres:

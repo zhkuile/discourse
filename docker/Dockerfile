@@ -45,7 +45,6 @@ EXPOSE 3000
 COPY docker/entrypoint.sh /entrypoint.sh
 USER root
 RUN chmod +x /entrypoint.sh
-USER discourse
 
 # 健康检查
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
